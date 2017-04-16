@@ -89,7 +89,7 @@ public class BoardManager : MonoBehaviour
     {
         int rand = Random.Range(0, 101);
 
-        if (0 <= rand && rand < 80)
+        if (0 <= rand && rand <= 100)
         {
             int scoreRand = Random.Range(1, 6);
             return scoreRand;

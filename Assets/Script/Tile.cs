@@ -18,8 +18,12 @@ public class Tile : MonoBehaviour
 
     public Sprite[] skin;
 
+    public GameObject particles;
+
     Animator ani;
     AudioSource audio;
+
+    Color color = new Color();
 
     public static void SetBoard(BoardManager b)
     {
@@ -99,6 +103,16 @@ public class Tile : MonoBehaviour
         kind = rand;
        
         ani.SetTrigger("Create");
+
+        GameObject temp = Instantiate(particles,transform.position + Vector3.back,Quaternion.identity);
+
+
+        for (int i = 0; i < temp.transform.childCount; i++) {
+            temp.transform.GetChild(i).GetComponent<SpriteRenderer>().color = color;
+        }
+
+        Destroy(temp, 2f);
+
         audio.PlayOneShot(se[0],0.2f);
     }
 
@@ -109,7 +123,7 @@ public class Tile : MonoBehaviour
 
     void ColorChange(int i)
     {
-        Color color = new Color();
+        
         switch (i)
         {
             //==== 스코어 블럭

@@ -111,7 +111,7 @@ public class Tile : MonoBehaviour
             temp.transform.GetChild(i).GetComponent<SpriteRenderer>().color = color;
         }
 
-        Destroy(temp, 2f);
+        Destroy(temp, 1f);
 
         audio.PlayOneShot(se[0],0.2f);
     }

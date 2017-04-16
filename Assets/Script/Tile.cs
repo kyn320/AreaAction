@@ -12,7 +12,6 @@ public class Tile : MonoBehaviour
 
     public int id = 0, kind = 0;
 
-
     public List<Tile> node;
 
     public AudioClip[] se;
@@ -39,7 +38,7 @@ public class Tile : MonoBehaviour
         id = _id;
         kind = _kind;
         ColorChange(kind);
-        spr.sprite = skin[3];
+        spr.sprite = skin[0];
     }
 
     public void SetNode()
@@ -47,7 +46,7 @@ public class Tile : MonoBehaviour
         GameObject[] max = GameObject.FindGameObjectsWithTag("Tile");
         for (int i = 0; i < max.Length; i++)
         {
-            if (max[i] != this.gameObject && Vector2.Distance(transform.position, max[i].transform.position) <= 1)
+            if (max[i] != this.gameObject && Vector2.Distance(transform.position, max[i].transform.position) <= 1.12f)
             {
                 node.Add(max[i].GetComponent<Tile>());
             }
@@ -110,73 +109,63 @@ public class Tile : MonoBehaviour
 
     void ColorChange(int i)
     {
+        Color color = new Color();
         switch (i)
         {
             //==== 스코어 블럭
             case 1:
-                spr.color = Color.black;
+                ColorUtility.TryParseHtmlString("#FF4646", out color);
                 break;
             case 2:
-                spr.color = Color.blue;
+                ColorUtility.TryParseHtmlString("#ff7f00", out color);
                 break;
             case 3:
-                spr.color = Color.cyan;
+                ColorUtility.TryParseHtmlString("#80E12A", out color);
                 break;
             case 4:
-                spr.color = Color.gray;
+                ColorUtility.TryParseHtmlString("#00A5FF", out color);
                 break;
             case 5:
-                spr.color = Color.green;
+                ColorUtility.TryParseHtmlString("#CC47AD", out color);
                 break;
             //==== 공격 포인트 블럭
             case 6:
-                spr.color = Color.grey;
+                ColorUtility.TryParseHtmlString("#703800", out color);
                 break;
             //==== 회복 포인트 블럭
             case 7:
-                spr.color = Color.magenta;
+                ColorUtility.TryParseHtmlString("#FFAAFF", out color);
                 break;
             //==== 스킬 1 포인트 블럭
             case 8:
-                spr.color = Color.red;
-                break;
             //==== 스킬 2 포인트 블럭
             case 9:
-                spr.color = Color.white;
-                break;
             //==== 스킬 3 포인트 블럭
             case 10:
-                spr.color = Color.yellow;
+                ColorUtility.TryParseHtmlString("#000000", out color);
                 break;
             //==== 공격력 증가
             case 11:
-                spr.color = new Color(0.1f, 0.3f, 0.1f,1f);
-                break;
             //==== 공격력 감소
             case 12:
-                spr.color = new Color(0.3f, 0.7f, 0.3f, 0.5f);
-                break;
             //==== x초 동안 점수 +2배
             case 13:
-                spr.color = new Color(1f, 0.9f, 0.5f, 1f);
-                break;
             //==== 콤보 유지
             case 14:
-                spr.color = new Color(0.7f, 0.7f, 1f, 1f);
-                break;
             //==== 랜덤 1 종류 스코어 블럭 파괴
             case 15:
-                spr.color = new Color(0.9f, 0.5f, 0.9f, 1f);
-                break;
             //==== x초 동안 크리티컬 확률 100%
             case 16:
-                spr.color = new Color(0.7f, 1f, 0.7f, 1f);
+                ColorUtility.TryParseHtmlString("#ffffff", out color);
                 break;
             //==== 골드 획득
             case 17:
-                spr.color = new Color(0.5f, 0.1f, 0.5f, 0.5f);
+                ColorUtility.TryParseHtmlString("#FFC31E", out color);
                 break;
         }
+
+        spr.color = color;
+
     }
 
     public void DebugColor()

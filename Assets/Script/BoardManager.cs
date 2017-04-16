@@ -6,8 +6,6 @@ using UnityEngine.UI;
 public class BoardManager : MonoBehaviour
 {
 
-    // x >> + 0.5 // y >> -0.83
-
     public static BoardManager instance;
 
     UIInGameManager uiManager;
@@ -91,12 +89,12 @@ public class BoardManager : MonoBehaviour
     {
         int rand = Random.Range(0, 101);
 
-        if (0 <= rand && rand < 60)
+        if (0 <= rand && rand < 80)
         {
             int scoreRand = Random.Range(1, 6);
             return scoreRand;
         }
-        else if (60 <= rand && rand < 80)
+        else if (80 <= rand && rand < 90)
         {
             int actionRand = Random.Range(0,20);
             if (player.info.job == Job.Attack)
@@ -120,7 +118,7 @@ public class BoardManager : MonoBehaviour
                     return 7;
             }
         }
-        else if (80 <= rand && rand < 95)
+        else if (90 <= rand && rand < 99)
         {
             int SkillRand = Random.Range(0, 16);
             if (0 <= SkillRand && SkillRand < 8)
@@ -166,7 +164,7 @@ public class BoardManager : MonoBehaviour
     public void PrintResult()
     {
         if(selectTileList.Count > 0)
-        Debug.Log("총 " + (selectTileList.Count) + "개의 "+tileList[selectTileList[0]].kind+" 블럭이 선택되었습니다.");
+        Debug.Log("총 " + (selectTileList.Count) + "개의 "+tileList[selectTileList[0] - 1].kind+" 블럭이 선택되었습니다.");
     }
 
     public void AddQueue()
@@ -187,7 +185,7 @@ public class BoardManager : MonoBehaviour
                 chain = selectTileList.Count;
                 uiManager.UpdateCombo(player.combo);
                 uiManager.UpdateChain(chain);
-                KindWork(tileList[selectTileList[0]].kind, selectTileList.Count);
+                KindWork(tileList[selectTileList[0] - 1].kind, selectTileList.Count);
                 ResetKind();
                 selectTileList.Clear();
             }
@@ -259,6 +257,7 @@ public class BoardManager : MonoBehaviour
                 break;
         }
     }
+
 
     public void AddSelectList(int id)
     {

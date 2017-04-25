@@ -37,11 +37,11 @@ public class Player : MonoBehaviour {
     /// <param name="damage">데미지</param>
     public void DamageHP(int damage)
     {
-        hp -= damage * info.Options.SaveDamagePercent;
+        hp -= damage * info.options.SaveDamagePercent;
 
-        hp = Mathf.Clamp(hp,-info.HP, info.HP);
+        hp = Mathf.Clamp(hp,-info.hp, info.hp);
 
-        ui.UpdateHp(hp,info.HP);
+        ui.UpdateHp(hp,info.hp);
     }
 
     /// <summary>
@@ -50,11 +50,11 @@ public class Player : MonoBehaviour {
     /// <param name="chain">체인 수</param>
     public void RecoverHP(int chain)
     {
-        hp += info.Recover * chain * info.Options.AddRecover;
+        hp += info.recover * chain * info.options.AddRecover;
 
-        hp = Mathf.Clamp(hp, -info.HP, info.HP);
+        hp = Mathf.Clamp(hp, -info.hp, info.hp);
 
-        ui.UpdateHp(hp, info.HP);
+        ui.UpdateHp(hp, info.hp);
     }
 
     /// <summary>
@@ -65,11 +65,11 @@ public class Player : MonoBehaviour {
     {
         attackPoint += chain;
 
-        if (attackPoint - info.RequireAttackPoint > 0) {
-            damage += (int)(chain * info.Damage * 0.25f);
+        if (attackPoint - info.requireAttackPoint > 0) {
+            damage += (int)(chain * info.damage * 0.25f);
         }
 
-        ui.UpdateAttackPoint(attackPoint,info.RequireAttackPoint);
+        ui.UpdateAttackPoint(attackPoint,info.requireAttackPoint);
         ui.UpdateDamage(DamageWork());
     }
 
@@ -83,7 +83,7 @@ public class Player : MonoBehaviour {
     }
 
     public int DamageWork() {
-        return (int)((info.Damage + damage) + ((info.Damage + damage) * (addDamage + info.Options.AddDamage)));
+        return (int)((info.damage + damage) + ((info.damage + damage) * (addDamage + info.options.AddDamage)));
     }
 
 }

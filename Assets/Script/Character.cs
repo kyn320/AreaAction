@@ -15,7 +15,7 @@ public class Character {
 
     public Job job;
 
-    public float hP;
+    public float hp;
     public float damage;
     public float recover;
 

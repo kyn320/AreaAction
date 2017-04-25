@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour {
     public void AddScore(int chain, int combo, int multiple) {
         score += chain * baseScore * combo * multiple;
         uiManager.UpdateScore(score);
+        NetworkManager.instance.EmitScore(NetworkManager.instance.nickName,score);
     }
 
 

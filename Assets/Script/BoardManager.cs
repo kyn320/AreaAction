@@ -89,7 +89,7 @@ public class BoardManager : MonoBehaviour
     {
         int rand = Random.Range(0, 101);
 
-        if (0 <= rand && rand <= 100)
+        if (0 <= rand && rand <= 80)
         {
             int scoreRand = Random.Range(1, 6);
             return scoreRand;
@@ -97,14 +97,14 @@ public class BoardManager : MonoBehaviour
         else if (80 <= rand && rand < 90)
         {
             int actionRand = Random.Range(0,20);
-            if (player.info.job == Job.Attack)
+            if (player.info.Job == Job.Attack)
             {
                 if (0 <= actionRand && actionRand <= 12)
                     return 6;
                 else
                     return 7;
             }
-            else if (player.info.job == Job.Save)
+            else if (player.info.Job == Job.Save)
             {
                 if (0 <= actionRand && actionRand <= 12)
                     return 7;

@@ -92,7 +92,7 @@ public class UIInGameManager : MonoBehaviour {
         //게이지 효과
         attackPointGage.fillAmount = attackPoint / maxAttackPoint;
 
-        if (attackPoint == maxAttackPoint)
+        if (attackPoint >= maxAttackPoint)
             attackPointGage.GetComponent<Button>().interactable = true;
         else
             attackPointGage.GetComponent<Button>().interactable = false;
@@ -113,7 +113,10 @@ public class UIInGameManager : MonoBehaviour {
     /// <param name="combo">combo 수</param>
     public void UpdateCombo(int combo) {
         comboText.text = "Combo " + combo;
+        comboObject.GetComponent<Animator>().SetTrigger("Combo");
     }
+
+    
 
     /// <summary>
     /// Illust를 업데이트 하는 함수

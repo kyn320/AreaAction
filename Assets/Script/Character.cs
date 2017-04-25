@@ -8,23 +8,24 @@ using UnityEngine;
 [System.Serializable]
 public class Character {
 
-    public string Name;
+    public string name;
     public int id;
     [TextArea]
-    public string Context;
+    public string context;
 
     public Job job;
 
-    public float HP;
-    public float Damage;
-    public float Recover;
+    public float hP;
+    public float damage;
+    public float recover;
 
-    public int RequireAttackPoint;
+    public int requireAttackPoint;
 
-    public Skill[] Skills;
+    public Skill[] skills = new Skill[3];
 
     public CharacterOption options;
 
+    public Sprite illust;
 }
 
 /// <summary>

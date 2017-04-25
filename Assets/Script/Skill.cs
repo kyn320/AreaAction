@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
 public class Skill {
 
-    public string Name;
+    public string name;
     public int id;
-    public string Context;
-    
-
+    public string context;
+    public Sprite icon;
+    public int requirePoint;
 
 }

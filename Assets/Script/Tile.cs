@@ -3,6 +3,57 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public class TileInfo
+{
+    public enum TileKind
+    {
+        Score
+        , Attack
+        , Recover
+        , Skill
+        , Item
+    }
+
+    public TileKind kind;
+
+    public enum ScoreMultiply {
+        Zero
+        , One
+        , Two
+        , Three
+        , Four
+        , Five
+    }
+
+    public ScoreMultiply scoreMultiply;
+
+    public enum SkillKind {
+        Zero
+        , One
+        , Two
+        , Three
+    }
+
+    public SkillKind skillKind;
+
+    public enum ItemKind {
+        AddAttackNumber
+        , AddAttackPercent
+        , AddRecoverNumber
+        , AddRecoverPercent
+        , ComboProtect
+        , BlockDestory
+        , AddScorePercentForSeconds
+        , AddCriticalPercentForSeconds
+        , AddGold
+    }
+
+    public ItemKind[] itemKind;
+
+}
+
+
+
 public class Tile : MonoBehaviour
 {
 
@@ -57,21 +108,29 @@ public class Tile : MonoBehaviour
         }
     }
 
-    void RootCheckNode() {
+    void RootCheckNode()
+    {
         int cnt = 0;
         board.AddQueue();
-        for (int i = 0; i < node.Count; i++)
+        if (kind < 8)
         {
-            if (kind == node[i].kind && board.FindTileID(node[i].id))
+            for (int i = 0; i < node.Count; i++)
             {
-                cnt++;
-                node[i].CheckNode();
+                if (kind == node[i].kind && board.FindTileID(node[i].id))
+                {
+                    cnt++;
+                    node[i].CheckNode();
+                }
+            }
+            if (cnt > 0)
+            {
+                board.AddSelectList(id);
             }
         }
-        if (cnt > 0)
-        {
+        else {
             board.AddSelectList(id);
         }
+
         board.RemoveQueue();
     }
 
@@ -101,29 +160,31 @@ public class Tile : MonoBehaviour
             rand = board.KindRandomBalance();
         } while (kind == rand);
         kind = rand;
-       
+
         ani.SetTrigger("Create");
 
-        GameObject temp = Instantiate(particles,transform.position + Vector3.back,Quaternion.identity);
+        GameObject temp = Instantiate(particles, transform.position + Vector3.back, Quaternion.identity);
 
 
-        for (int i = 0; i < temp.transform.childCount; i++) {
+        for (int i = 0; i < temp.transform.childCount; i++)
+        {
             temp.transform.GetChild(i).GetComponent<SpriteRenderer>().color = color;
         }
 
         Destroy(temp, 1f);
 
-        audio.PlayOneShot(se[0],0.2f);
+        audio.PlayOneShot(se[0], 0.2f);
     }
 
-    public void AnimationColors() {
+    public void AnimationColors()
+    {
         ColorChange(kind);
-        audio.PlayOneShot(se[1],0.2f);
+        audio.PlayOneShot(se[1], 0.2f);
     }
 
     void ColorChange(int i)
     {
-        
+
         switch (i)
         {
             //==== 스코어 블럭
@@ -140,7 +201,7 @@ public class Tile : MonoBehaviour
                 ColorUtility.TryParseHtmlString("#00A5FF", out color);
                 break;
             case 5:
-                ColorUtility.TryParseHtmlString("#CC47AD", out color);
+                ColorUtility.TryParseHtmlString("#7D00FF", out color);
                 break;
             //==== 공격 포인트 블럭
             case 6:
@@ -148,7 +209,7 @@ public class Tile : MonoBehaviour
                 break;
             //==== 회복 포인트 블럭
             case 7:
-                ColorUtility.TryParseHtmlString("#FFAAFF", out color);
+                ColorUtility.TryParseHtmlString("#FF00C3", out color);
                 break;
             //==== 스킬 1 포인트 블럭
             case 8:
@@ -156,7 +217,7 @@ public class Tile : MonoBehaviour
             case 9:
             //==== 스킬 3 포인트 블럭
             case 10:
-                ColorUtility.TryParseHtmlString("#000000", out color);
+                ColorUtility.TryParseHtmlString("#FFFFFF", out color);
                 break;
             //==== 공격력 증가
             case 11:
@@ -170,7 +231,7 @@ public class Tile : MonoBehaviour
             case 15:
             //==== x초 동안 크리티컬 확률 100%
             case 16:
-                ColorUtility.TryParseHtmlString("#ffffff", out color);
+                ColorUtility.TryParseHtmlString("#454647", out color);
                 break;
             //==== 골드 획득
             case 17:

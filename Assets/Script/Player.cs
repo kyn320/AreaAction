@@ -14,6 +14,7 @@ public class Player : MonoBehaviour {
     public float hp;
     public int attackPoint;
     public int combo;
+    public int[] skillPoints = new int[3] {0,0,0};
     UIInGameManager ui;
 
     void Awake() {
@@ -36,7 +37,7 @@ public class Player : MonoBehaviour {
     /// <param name="damage">데미지</param>
     public void DamageHP(int damage)
     {
-        hp -= damage * info.options.SaveDamagePercent;
+        hp -= damage * info.Options.SaveDamagePercent;
 
         hp = Mathf.Clamp(hp,-info.HP, info.HP);
 
@@ -49,7 +50,7 @@ public class Player : MonoBehaviour {
     /// <param name="chain">체인 수</param>
     public void RecoverHP(int chain)
     {
-        hp += info.Recover * chain * info.options.AddRecover;
+        hp += info.Recover * chain * info.Options.AddRecover;
 
         hp = Mathf.Clamp(hp, -info.HP, info.HP);
 
@@ -82,7 +83,7 @@ public class Player : MonoBehaviour {
     }
 
     public int DamageWork() {
-        return (int)((info.Damage + damage) + ((info.Damage + damage) * (addDamage + info.options.AddDamage)));
+        return (int)((info.Damage + damage) + ((info.Damage + damage) * (addDamage + info.Options.AddDamage)));
     }
 
 }

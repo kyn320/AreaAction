@@ -45,6 +45,7 @@ using System.Text;
 using System.Threading;
 using WebSocketSharp.Net;
 using WebSocketSharp.Net.WebSockets;
+using UnityEngine;
 
 namespace WebSocketSharp
 {
@@ -657,6 +658,7 @@ namespace WebSocketSharp
     {
       _logger.Debug ("Unsupported frame:\n" + frame.PrintToString (false));
       acceptException (new WebSocketException (code, reason), null);
+            UnityEngine.Debug.Log("unsupport");
 
       return false;
     }
@@ -1005,11 +1007,12 @@ namespace WebSocketSharp
 
       return true;
     }
-
     private void enqueueToMessageEventQueue (MessageEventArgs e)
     {
-      lock (_forMessageEventQueue)
-        _messageEventQueue.Enqueue (e);
+            lock (_forMessageEventQueue)
+            {
+                _messageEventQueue.Enqueue(e);
+            }
     }
 
     private void error (string message)
@@ -1298,8 +1301,10 @@ namespace WebSocketSharp
             lock (_forEvent) {
               try {
                 var e = dequeueFromMessageEventQueue ();
-                if (e != null && _readyState == WebSocketState.Open)
-                  OnMessage.Emit (this, e);
+                        if (e != null && _readyState == WebSocketState.Open)
+                        {
+                            OnMessage.Emit(this, e);
+                        }
               }
               catch (Exception ex) {
                 acceptException (ex, "An exception has occurred while OnMessage.");
@@ -1441,7 +1446,7 @@ namespace WebSocketSharp
     internal static string CreateBase64Key ()
     {
       var src = new byte [16];
-      var rand = new Random ();
+      var rand = new System.Random ();
       rand.NextBytes (src);
 
       return Convert.ToBase64String (src);

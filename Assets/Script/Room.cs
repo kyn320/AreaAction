@@ -10,5 +10,6 @@ public class Room {
 
     public int fullPlayers;
 
+    public List<User> userList;
     
 }

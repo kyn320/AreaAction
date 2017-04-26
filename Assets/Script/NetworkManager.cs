@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using SocketIO;
 
 public class NetworkManager : MonoBehaviour
@@ -13,24 +14,36 @@ public class NetworkManager : MonoBehaviour
 
     public string nickName;
 
+    public InputField editor;
+
     // Use this for initialization
     void Start()
     {
-        
+
         instance = this;
         socket = GetComponent<SocketIOComponent>();
 
         nickName = "User" + System.DateTime.Now;
 
+        socket.On("userList", OnUserList);
         socket.On("join", OnJoin);
         socket.On("chat", OnChat);
         socket.On("score", OnScore);
         socket.On("attack", OnAttack);
 
-        
+
     }
 
-    public void LoginTest() {
+    public void urlChange() {
+        socket.url = "ws://"+editor.text+":8080/socket.io/?EIO=3&transport=websocket";
+    }
+
+    public void LoginTest()
+    {
+        urlChange();
+
+        socket.Connect();
+
         EmitLogin(nickName);
         EmitJoin(room);
     }
@@ -45,12 +58,25 @@ public class NetworkManager : MonoBehaviour
         print("Login is called");
     }
 
+    public void OnUserList(SocketIOEvent e)
+    {
+        JSONObject json = e.data;
+
+        string[] users = json.GetField("userList").ToString().Replace("[", "").Replace("]", "").Replace("\"","").Split(',');
+
+        for (int i = 0; i < users.Length; i++) {
+            room.userList.Add(new User(users[i]));
+        }
+    }
+
     public void OnJoin(SocketIOEvent e)
     {
         JSONObject json = e.data;
 
         string name = json.GetField("nick").str;
         int characterID = (int)(json.GetField("character").f);
+
+        room.userList.Add(new User(name, 0, characterID));
 
         print(name + " 님이 접속 |  " + characterID);
     }
@@ -59,6 +85,7 @@ public class NetworkManager : MonoBehaviour
     {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
         json.AddField("roomName", room.id + room.name);
+        json.AddField("character", 1);
 
         socket.Emit("join", json);
     }
@@ -89,6 +116,16 @@ public class NetworkManager : MonoBehaviour
 
         string name = json.GetField("nick").str;
         int score = (int)(json.GetField("score").f);
+
+        for (int i = 0; i < room.userList.Count; i++)
+        {
+            if (room.userList[i].name == name)
+            {
+                room.userList[i].score = score;
+                UIInGameManager.instance.UpdateUserRanking(room);
+                break;
+            }
+        }
 
         print(name + " 의 점수 획득 = " + score);
     }

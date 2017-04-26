@@ -44,6 +44,10 @@ public class UIInGameManager : MonoBehaviour
     //ranking
     public Text[] rankTexts;
 
+    //chat
+    public int cnt = 0;
+    public Text chatLog;
+    public InputField chatInput;
 
     void Awake()
     {
@@ -164,10 +168,24 @@ public class UIInGameManager : MonoBehaviour
 
         for (int i = 0; i < room.userList.Count; i++)
         {
-            rankTexts[i].text = room.userList[i].name.Substring(0, 7) + " : " + room.userList[i].score;
+            rankTexts[i].text = room.userList[i].name+ " : " + room.userList[i].score;
 
         }
 
     }
 
+    public void ChatSend() {
+        NetworkManager.instance.EmitChat(NetworkManager.instance.nickName,chatInput.text);
+        chatInput.text = "";
+    }
+
+    public void UpdateChatLog(string name, string message) {
+        if (cnt >= 4)
+        {
+            cnt = 0;
+            chatLog.text = "";
+        }
+        chatLog.text += name +" : "+message+"\n";
+        cnt++;
+    }
 }

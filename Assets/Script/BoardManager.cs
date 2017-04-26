@@ -44,6 +44,8 @@ public class BoardManager : MonoBehaviour
         CreatHexTile();
     }
 
+
+
     void CreatHexTile()
     {
         //변수를 캐싱

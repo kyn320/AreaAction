@@ -23,7 +23,7 @@ public class NetworkManager : MonoBehaviour
         instance = this;
         socket = GetComponent<SocketIOComponent>();
 
-        nickName = "User" + System.DateTime.Now;
+        nickName = "User" + Random.Range(0,100);
 
         socket.On("userList", OnUserList);
         socket.On("join", OnJoin);
@@ -40,10 +40,18 @@ public class NetworkManager : MonoBehaviour
 
     public void LoginTest()
     {
-        urlChange();
+        //urlChange();
+        //socket.Connect();
 
-        socket.Connect();
+        StartCoroutine("WaitForConnet");
+    }
 
+    IEnumerator WaitForConnet() {
+        yield return new WaitForSeconds(0.1f);
+        Test();
+    }
+
+    public void Test() {
         EmitLogin(nickName);
         EmitJoin(room);
     }
@@ -98,6 +106,7 @@ public class NetworkManager : MonoBehaviour
         string message = json.GetField("message").str;
 
         print(name + " 의 메세지 " + message);
+        UIInGameManager.instance.UpdateChatLog(name,message);
     }
 
     public void EmitChat(string name, string message)
@@ -111,7 +120,6 @@ public class NetworkManager : MonoBehaviour
 
     public void OnScore(SocketIOEvent e)
     {
-        print("asdqwe");
         JSONObject json = e.data;
 
         string name = json.GetField("nick").str;

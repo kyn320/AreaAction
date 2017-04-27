@@ -15,6 +15,9 @@ public class UIInGameManager : MonoBehaviour
     //Timer
     public Text timer;
 
+    //rank
+    public Text rank;
+
     //Score
     public Text scoreText;
 
@@ -49,6 +52,15 @@ public class UIInGameManager : MonoBehaviour
     public Text chatLog;
     public InputField chatInput;
 
+    //wait 
+    public GameObject waitPannel;
+
+    //end
+    public GameObject endPannel;
+    public Text endText;
+
+    int oldRank = 1;
+
     void Awake()
     {
         //싱글톤 생성
@@ -62,6 +74,22 @@ public class UIInGameManager : MonoBehaviour
     public void UpdateTimer(float time)
     {
         timer.text = (int)(time / 60) + " : " + (int)(time % 60);
+    }
+
+
+    public void UpdateRank(int rankNumber) {
+        if (oldRank != rankNumber)
+        {
+            oldRank = rankNumber;
+            rank.GetComponent<Animator>().SetTrigger("Change");
+            rank.text = rankNumber.ToString();
+            SoundManager.instance.PlayUISE();
+        }
+    }
+
+    public void EndGame() {
+        endPannel.SetActive(true);
+        endText.text = "게임 결과!\n 순위 :" + oldRank;
     }
 
     /// <summary>
@@ -132,7 +160,9 @@ public class UIInGameManager : MonoBehaviour
         comboObject.GetComponent<Animator>().SetTrigger("Combo");
     }
 
-
+    public void UpdateWaitPannel() {
+        waitPannel.SetActive(false);
+    }
 
     /// <summary>
     /// Illust를 업데이트 하는 함수
@@ -169,7 +199,10 @@ public class UIInGameManager : MonoBehaviour
         for (int i = 0; i < room.userList.Count; i++)
         {
             rankTexts[i].text = room.userList[i].name+ " : " + room.userList[i].score;
-
+            if (room.userList[i].name == NetworkManager.instance.nickName) {
+                print("asd : " + (i+1) );
+                UpdateRank((i+1));
+            }
         }
 
     }

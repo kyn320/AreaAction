@@ -5,7 +5,8 @@ using UnityEngine;
 /// <summary>
 /// 인게임을 관리하는 매니저 입니다.
 /// </summary>
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
 
     public static GameManager instance;
 
@@ -13,34 +14,45 @@ public class GameManager : MonoBehaviour {
     UIInGameManager uiManager;
     Player player;
 
+    public bool isplayed = false;
 
     public float time = 90;
     public int baseScore = 100;
 
     public int score = 0;
 
-    void Awake() {
+    void Awake()
+    {
         instance = this;
     }
 
-    void Start() {
+    void Start()
+    {
         uiManager = UIInGameManager.instance;
         player = Player.instance;
         boardManager = BoardManager.instance;
     }
 
-    void Update() {
-        Timer();
+    void Update()
+    {
+        if (isplayed)
+            Timer();
     }
 
     /// <summary>
     /// 타이머 함수
     /// </summary>
-    void Timer() {
+    void Timer()
+    {
         time -= Time.deltaTime;
         uiManager.UpdateTimer(time);
         if (time < 0)
-            time = 200;
+        {
+            time = 10;
+            uiManager.EndGame();
+            BoardManager.instance.EndGame();
+            isplayed = false;
+        }
     }
 
     /// <summary>
@@ -49,10 +61,11 @@ public class GameManager : MonoBehaviour {
     /// <param name="chain">체인 수</param>
     /// <param name="combo">콤보 수</param>
     /// <param name="multiple">타일의 배수</param>
-    public void AddScore(int chain, int combo, int multiple) {
+    public void AddScore(int chain, int combo, int multiple)
+    {
         score += chain * baseScore * combo * multiple;
         uiManager.UpdateScore(score);
-        NetworkManager.instance.EmitScore(NetworkManager.instance.nickName,score);
+        NetworkManager.instance.EmitScore(NetworkManager.instance.nickName, score);
     }
 
 

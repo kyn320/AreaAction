@@ -91,7 +91,7 @@ public class BoardManager : MonoBehaviour
     {
         int rand = Random.Range(0, 101);
 
-        if (0 <= rand && rand <= 80)
+        if (0 <= rand && rand <= 100)
         {
             int scoreRand = Random.Range(1, 6);
             return scoreRand;
@@ -185,6 +185,7 @@ public class BoardManager : MonoBehaviour
                 PrintResult();
                 player.combo++;
                 chain = selectTileList.Count;
+                SoundManager.instance.PlayComboVoice(player.combo);
                 uiManager.UpdateCombo(player.combo);
                 uiManager.UpdateChain(chain);
                 KindWork(tileList[selectTileList[0] - 1].kind, selectTileList.Count);
@@ -287,6 +288,12 @@ public class BoardManager : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void EndGame() {
+        for (int i = 0; i < tileList.Count; i++) {
+            tileList[i].Del();
+        }
     }
 
 }

@@ -27,6 +27,7 @@ public class NetworkManager : MonoBehaviour
 
         socket.On("userList", OnUserList);
         socket.On("join", OnJoin);
+        socket.On("start", OnStart);
         socket.On("chat", OnChat);
         socket.On("score", OnScore);
         socket.On("attack", OnAttack);
@@ -96,6 +97,11 @@ public class NetworkManager : MonoBehaviour
         json.AddField("character", 1);
 
         socket.Emit("join", json);
+    }
+
+    public void OnStart(SocketIOEvent e) {
+        GameManager.instance.isplayed = true;
+        UIInGameManager.instance.UpdateWaitPannel();
     }
 
     public void OnChat(SocketIOEvent e)

@@ -81,6 +81,10 @@ public class Tile : MonoBehaviour
         board = b;
     }
 
+    public void Del() {
+        Destroy(this.gameObject);
+    }
+
     void Awake()
     {
         ani = GetComponent<Animator>();

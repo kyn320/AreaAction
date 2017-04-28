@@ -73,7 +73,7 @@ public class UIInGameManager : MonoBehaviour
     /// <param name="time">시간 초</param>
     public void UpdateTimer(float time)
     {
-        timer.text = (int)(time / 60) + " : " + (int)(time % 60);
+        timer.text = string.Format("{0} : {1:D2}", (int)(time / 60), (int)(time % 60));
     }
 
 
@@ -199,7 +199,7 @@ public class UIInGameManager : MonoBehaviour
         for (int i = 0; i < room.userList.Count; i++)
         {
             rankTexts[i].text = room.userList[i].name+ " : " + room.userList[i].score;
-            if (room.userList[i].name == NetworkManager.instance.nickName) {
+            if (room.userList[i].name == PlayerDataManager.instance.my.name) {
                 print("asd : " + (i+1) );
                 UpdateRank((i+1));
             }
@@ -208,7 +208,7 @@ public class UIInGameManager : MonoBehaviour
     }
 
     public void ChatSend() {
-        NetworkManager.instance.EmitChat(NetworkManager.instance.nickName,chatInput.text);
+        NetworkManager.instance.EmitChat(PlayerDataManager.instance.my.name, chatInput.text);
         chatInput.text = "";
     }
 

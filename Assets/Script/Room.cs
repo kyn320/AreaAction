@@ -8,9 +8,10 @@ public class Room {
     public int id;
     public string name;
 
+    public int currentPlayers;
     public int fullPlayers;
 
-    public List<User> userList;
+    public List<User> userList = new List<User>();
 
     public bool isPlayed;
 }

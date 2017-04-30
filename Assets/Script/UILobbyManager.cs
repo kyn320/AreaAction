@@ -17,6 +17,12 @@ public class UILobbyManager : MonoBehaviour {
 
     public GameObject slot;
 
+    public List<UIRoomSlot> slotList;
+
+    //MakeRoom
+    public InputField roomTitleInput;
+    public Dropdown roomMaxNumber;
+
     [SerializeField]
     int count;
 
@@ -26,10 +32,13 @@ public class UILobbyManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        MakeSlots();
 	}
 
-    void MakeSlots() {
+    public void MakeSlots() {
+        DelRoomList();
+
+        count = NetworkManager.instance.roomList.Count;
+
         float height = (slotSize.y) * count + slotMarign.y * 2;
 
         contentView.sizeDelta = new Vector2(0, height);
@@ -37,14 +46,27 @@ public class UILobbyManager : MonoBehaviour {
         for (int i = 0; i < count; i++) {
             GameObject g =  Instantiate(slot);
             RectTransform gTr = g.GetComponent<RectTransform>();
-            gTr.parent = contentView;
-            print(slotStartPos.y + -i * (slotSize.y + slotMarign.y));
+            UIRoomSlot data = g.GetComponent<UIRoomSlot>();
+            slotList.Add(data);
+            gTr.SetParent(contentView);
             gTr.localPosition = new Vector2(0, slotStartPos.y + -i * (slotSize.y) - slotMarign.y);
             gTr.localScale = new Vector3(1, 1, 1);
+            gTr.sizeDelta = new Vector2(-10, 60);
+            data.SetSlot(NetworkManager.instance.roomList[i]);
         }
     }
 
-    public void MakeRoom() {
-        print("asdqwe");
+    public void DelRoomList() {
+        for (int i = 0; i < slotList.Count; i++) {
+            slotList[i].Del();
+        }
+
+        slotList.Clear();
     }
+
+    public void MakeRoom() {
+        NetworkManager.instance.EmitMakeRoom(roomTitleInput.text, int.Parse(roomMaxNumber.options[roomMaxNumber.value].text));
+    }
+
+
 }

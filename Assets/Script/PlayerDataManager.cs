@@ -11,6 +11,8 @@ public class PlayerDataManager : MonoBehaviour {
     void Awake() {
         instance = this;
         my = new User("User" + Random.Range(0, 100));
+
+        DontDestroyOnLoad(this.gameObject);
     }
 
 

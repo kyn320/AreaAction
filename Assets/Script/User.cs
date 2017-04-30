@@ -6,6 +6,7 @@ using UnityEngine;
 public class User {
 
     public string name;
+    public string socketID;
     public int score;
     public int characterID;
 
@@ -20,6 +21,22 @@ public class User {
         this.name = name;
         this.score = 0;
         this.characterID = 0;
+    }
+
+    public User(string name , string socketID)
+    {
+        this.name = name;
+        this.score = 0;
+        this.characterID = 0;
+        this.socketID = socketID;
+    }
+
+    public User(string name, string socketID, int characterID)
+    {
+        this.name = name;
+        this.score = 0;
+        this.characterID = characterID;
+        this.socketID = socketID;
     }
 
     public User(string name, int score)

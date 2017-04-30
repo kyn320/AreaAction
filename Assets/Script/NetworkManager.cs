@@ -14,7 +14,13 @@ public class NetworkManager : MonoBehaviour
 
     public InputField editor;
 
-    public Room TestRoom;
+    public Room enterRoom;
+
+    int index;
+
+    void Awake() {
+        DontDestroyOnLoad(this.gameObject);
+    }
 
     // Use this for initialization
     void Start()
@@ -23,16 +29,24 @@ public class NetworkManager : MonoBehaviour
         instance = this;
         socket = GetComponent<SocketIOComponent>();
 
-        
-
         socket.On("userList", OnUserList);
+        socket.On("enterRoom", OnEnterRoom);
         socket.On("join", OnJoin);
         socket.On("start", OnStart);
         socket.On("chat", OnChat);
         socket.On("score", OnScore);
         socket.On("attack", OnAttack);
         socket.On("roomList", OnRoomList);
+        socket.On("roomFinish", OnUpdateLobby);
+        socket.On("test", OnTest);
 
+        StartCoroutine("WaitForLobby");
+    }
+
+    public void OnTest(SocketIOEvent e) {
+        JSONObject json = e.data;
+
+        print(json.GetField("test").str);
     }
 
     public void urlChange() {
@@ -52,9 +66,16 @@ public class NetworkManager : MonoBehaviour
         Test();
     }
 
+    IEnumerator WaitForLobby() {
+        yield return new WaitForSeconds(0.1f);
+        JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
+        json.AddField("a",2);
+        socket.Emit("roomList",json);
+    }
+
     public void Test() {
         EmitLogin(PlayerDataManager.instance.my.name);
-        EmitJoin(TestRoom);
+        //EmitJoin(TestRoom);
     }
 
     public void EmitLogin(string name)
@@ -67,27 +88,64 @@ public class NetworkManager : MonoBehaviour
         print("Login is called");
     }
 
-    public void OnUserList(SocketIOEvent e)
-    {
-        TestRoom.userList.Clear();
-
+    public void OnLogin(SocketIOEvent e) {
         JSONObject json = e.data;
 
-        string[] users = json.GetField("userList").ToString().Replace("[", "").Replace("]", "").Replace("\"","").Split(',');
+        PlayerDataManager.instance.my.socketID = json.GetField("socketID").str;
 
-        for (int i = 0; i < users.Length; i++) {
-            TestRoom.userList.Add(new User(users[i]));
+    }
+
+    public void OnUserList(SocketIOEvent e)
+    {
+        print("clear?");
+        enterRoom.userList.Clear();
+
+        print("update userList");
+        
+        LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
+
+        print(e.data);
+
+        for (int i = 0; i < json["userList"].Count; ++i)
+        {
+            print("make user");
+            User user = new User();
+
+            user.socketID = json["userList"][i]["socketID"].ToString();
+            user.name = json["userList"][i]["name"].ToString();
+            user.characterID = int.Parse(json["userList"][i]["character"].ToString());
+
+            print(user.name  + " | " + user.socketID);
+
+            enterRoom.userList.Add(user);
         }
+    }
+
+    public void OnEnterRoom(SocketIOEvent e) {
+        JSONObject json = e.data;
+        string roomName = json.GetField("roomName").str;
+        for (int i = 0; i < roomList.Count; i++) {
+            if (roomName == roomList[i].id + roomList[i].name)
+            {
+                enterRoom = roomList[i];
+                break;
+            }
+        }
+
+        UnityEngine.SceneManagement.SceneManager.LoadScene("InGameUI");
     }
 
     public void OnJoin(SocketIOEvent e)
     {
         JSONObject json = e.data;
 
+        print("asdqwe");
+
         string name = json.GetField("name").str;
+        string socketID = json.GetField("socketID").str;
         int characterID = (int)(json.GetField("character").f);
 
-        TestRoom.userList.Add(new User(name, 0, characterID));
+        enterRoom.userList.Add(new User(name, socketID, characterID));
 
         print(name + " 님이 접속 |  " + characterID);
     }
@@ -96,12 +154,25 @@ public class NetworkManager : MonoBehaviour
     {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
         json.AddField("roomName", room.id + room.name);
-        json.AddField("character", 1);
+        json.AddField("socketID", PlayerDataManager.instance.my.socketID);
+        json.AddField("name", PlayerDataManager.instance.my.name);
+        json.AddField("character", 3);
 
         socket.Emit("join", json);
     }
 
+
+    public void EmitReady() {
+        JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
+        json.AddField("socketID", PlayerDataManager.instance.my.socketID);
+        json.AddField("name", PlayerDataManager.instance.my.name);
+        json.AddField("character", 3);
+
+        socket.Emit("ready", json);
+    }
+
     public void OnStart(SocketIOEvent e) {
+        print("gogo");
         GameManager.instance.isplayed = true;
         UIInGameManager.instance.UpdateWaitPannel();
     }
@@ -133,12 +204,12 @@ public class NetworkManager : MonoBehaviour
         string name = json.GetField("name").str;
         int score = (int)(json.GetField("score").f);
 
-        for (int i = 0; i < TestRoom.userList.Count; i++)
+        for (int i = 0; i < enterRoom.userList.Count; i++)
         {
-            if (TestRoom.userList[i].name == name)
+            if (enterRoom.userList[i].name == name)
             {
-                TestRoom.userList[i].score = score;
-                UIInGameManager.instance.UpdateUserRanking(TestRoom);
+                enterRoom.userList[i].score = score;
+                UIInGameManager.instance.UpdateUserRanking(enterRoom);
                 break;
             }
         }
@@ -175,10 +246,38 @@ public class NetworkManager : MonoBehaviour
         socket.Emit("attack", json);
     }
 
+    public void OnRoomList(SocketIOEvent e)
+    {
+        roomList.Clear();
 
+        print("json is work");
+        print(e.data.ToString());
+        LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
+        for (int i = 0;  i < json["roomLists"].Count; ++i) {
+            Room room = new Room();
 
-    public void OnRoomList(SocketIOEvent e) {
-        JSONObject json = e.data;
+            room.id = int.Parse(json["roomLists"][i]["id"].ToString());
+            room.name = json["roomLists"][i]["name"].ToString();
+            room.currentPlayers = int.Parse(json["roomLists"][i]["readyPlayers"].ToString());
+            room.fullPlayers = int.Parse(json["roomLists"][i]["fullPlayers"].ToString());
+            room.isPlayed = bool.Parse(json["roomLists"][i]["isPlayed"].ToString());
+
+            roomList.Add(room);
+        }
+    }
+
+    public void OnUpdateLobby(SocketIOEvent e) {
+        UILobbyManager.instance.MakeSlots();
+    }
+
+    public void EmitMakeRoom(string name, int max) {
+        JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
+
+        json.AddField("roomName", name);
+        json.AddField("fullPlayers",max);
+        
+        socket.Emit("make", json);
+
 
     }
 

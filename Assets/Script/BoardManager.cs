@@ -42,9 +42,14 @@ public class BoardManager : MonoBehaviour
         gameManager = GameManager.instance;
 
         CreatHexTile();
+
+        StartCoroutine("ReadyForSecondes");
     }
 
-
+    IEnumerator ReadyForSecondes() {
+        yield return new WaitForSeconds(0.1f);
+        NetworkManager.instance.EmitReady();
+    }
 
     void CreatHexTile()
     {

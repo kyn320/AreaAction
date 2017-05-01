@@ -11,7 +11,7 @@ public class User {
     public int characterID;
 
     public User() {
-        this.name = "User" + System.DateTime.Now;
+        this.name = "";
         this.score = 0;
         this.characterID = 0;
     }

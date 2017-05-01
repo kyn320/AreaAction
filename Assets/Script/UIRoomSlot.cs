@@ -30,7 +30,6 @@ public class UIRoomSlot : MonoBehaviour
             stateText.text = "Wait..";
         }
 
-        
         titleText.text = info.name;
         userCountText.text = info.currentPlayers + " / " + info.fullPlayers;
     }

@@ -200,7 +200,6 @@ public class UIInGameManager : MonoBehaviour
         {
             rankTexts[i].text = room.userList[i].name+ " : " + room.userList[i].score;
             if (room.userList[i].name == PlayerDataManager.instance.my.name) {
-                print("asd : " + (i+1) );
                 UpdateRank((i+1));
             }
         }
@@ -213,12 +212,17 @@ public class UIInGameManager : MonoBehaviour
     }
 
     public void UpdateChatLog(string name, string message) {
-        if (cnt >= 4)
+        if (cnt >= 2)
         {
             cnt = 0;
             chatLog.text = "";
         }
-        chatLog.text += name +" : "+message+"\n";
+        chatLog.text += name +" : \n"+message+"\n";
         cnt++;
     }
+
+    public void ExitGame() {
+        NetworkManager.instance.EmitExitRoom();
+    }
+
 }

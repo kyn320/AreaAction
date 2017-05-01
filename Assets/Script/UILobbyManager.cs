@@ -8,7 +8,7 @@ public class UILobbyManager : MonoBehaviour {
     public static UILobbyManager instance;
 
     //Header
-    public Text playerName;
+    public Text playerNameText;
 
     //ScrollView
     public RectTransform contentView;
@@ -32,7 +32,11 @@ public class UILobbyManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-	}
+        NetworkManager.instance.EmitRoomList();
+
+        SetPlayerName();
+    }
+    
 
     public void MakeSlots() {
         DelRoomList();
@@ -54,6 +58,10 @@ public class UILobbyManager : MonoBehaviour {
             gTr.sizeDelta = new Vector2(-10, 60);
             data.SetSlot(NetworkManager.instance.roomList[i]);
         }
+    }
+
+    public void SetPlayerName() {
+        playerNameText.text = PlayerDataManager.instance.my.name + "님 환영합니다!";
     }
 
     public void DelRoomList() {

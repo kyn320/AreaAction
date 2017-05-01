@@ -31,6 +31,7 @@ public class NetworkManager : MonoBehaviour
 
         socket.On("userList", OnUserList);
         socket.On("enterRoom", OnEnterRoom);
+        socket.On("login", OnLogin);
         socket.On("join", OnJoin);
         socket.On("start", OnStart);
         socket.On("chat", OnChat);
@@ -38,46 +39,18 @@ public class NetworkManager : MonoBehaviour
         socket.On("attack", OnAttack);
         socket.On("roomList", OnRoomList);
         socket.On("roomFinish", OnUpdateLobby);
-        socket.On("test", OnTest);
-
-        StartCoroutine("WaitForLobby");
+        socket.On("out", OnExitRoom);
+        
     }
 
-    public void OnTest(SocketIOEvent e) {
-        JSONObject json = e.data;
 
-        print(json.GetField("test").str);
-    }
-
-    public void urlChange() {
-        socket.url = "ws://"+editor.text+":8080/socket.io/?EIO=3&transport=websocket";
-    }
-
-    public void LoginTest()
-    {
-        //urlChange();
-        //socket.Connect();
-
-        StartCoroutine("WaitForConnet");
-    }
-
-    IEnumerator WaitForConnet() {
-        yield return new WaitForSeconds(0.1f);
-        Test();
-    }
-
-    IEnumerator WaitForLobby() {
-        yield return new WaitForSeconds(0.1f);
+    public void EmitRoomList() {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
         json.AddField("a",2);
         socket.Emit("roomList",json);
     }
 
-    public void Test() {
-        EmitLogin(PlayerDataManager.instance.my.name);
-        //EmitJoin(TestRoom);
-    }
-
+    
     public void EmitLogin(string name)
     {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
@@ -85,37 +58,31 @@ public class NetworkManager : MonoBehaviour
 
         socket.Emit("login", json);
 
-        print("Login is called");
     }
 
     public void OnLogin(SocketIOEvent e) {
         JSONObject json = e.data;
 
         PlayerDataManager.instance.my.socketID = json.GetField("socketID").str;
-
     }
 
     public void OnUserList(SocketIOEvent e)
     {
-        print("clear?");
         enterRoom.userList.Clear();
 
-        print("update userList");
+
         
         LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
-
-        print(e.data);
+        
 
         for (int i = 0; i < json["userList"].Count; ++i)
         {
-            print("make user");
             User user = new User();
 
             user.socketID = json["userList"][i]["socketID"].ToString();
             user.name = json["userList"][i]["name"].ToString();
             user.characterID = int.Parse(json["userList"][i]["character"].ToString());
-
-            print(user.name  + " | " + user.socketID);
+            
 
             enterRoom.userList.Add(user);
         }
@@ -138,16 +105,13 @@ public class NetworkManager : MonoBehaviour
     public void OnJoin(SocketIOEvent e)
     {
         JSONObject json = e.data;
-
-        print("asdqwe");
-
+        
         string name = json.GetField("name").str;
         string socketID = json.GetField("socketID").str;
         int characterID = (int)(json.GetField("character").f);
 
         enterRoom.userList.Add(new User(name, socketID, characterID));
-
-        print(name + " 님이 접속 |  " + characterID);
+        
     }
 
     public void EmitJoin(Room room)
@@ -172,7 +136,6 @@ public class NetworkManager : MonoBehaviour
     }
 
     public void OnStart(SocketIOEvent e) {
-        print("gogo");
         GameManager.instance.isplayed = true;
         UIInGameManager.instance.UpdateWaitPannel();
     }
@@ -183,8 +146,7 @@ public class NetworkManager : MonoBehaviour
 
         string name = json.GetField("name").str;
         string message = json.GetField("message").str;
-
-        print(name + " 의 메세지 " + message);
+        
         UIInGameManager.instance.UpdateChatLog(name,message);
     }
 
@@ -249,9 +211,7 @@ public class NetworkManager : MonoBehaviour
     public void OnRoomList(SocketIOEvent e)
     {
         roomList.Clear();
-
-        print("json is work");
-        print(e.data.ToString());
+        
         LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
         for (int i = 0;  i < json["roomLists"].Count; ++i) {
             Room room = new Room();
@@ -279,6 +239,18 @@ public class NetworkManager : MonoBehaviour
         socket.Emit("make", json);
 
 
+    }
+
+    public void EmitExitRoom() {
+        JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
+
+        json.AddField("a", 1);
+
+        socket.Emit("out", json);
+    }
+
+    public void OnExitRoom(SocketIOEvent e) {
+        UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
     }
 
 }

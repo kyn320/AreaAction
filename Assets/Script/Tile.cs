@@ -129,10 +129,12 @@ public class Tile : MonoBehaviour
             if (cnt > 0)
             {
                 board.AddSelectList(id);
+                board.rootTransform = this.transform;
             }
         }
         else {
             board.AddSelectList(id);
+            board.rootTransform = this.transform;
         }
 
         board.RemoveQueue();

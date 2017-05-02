@@ -9,8 +9,12 @@ using UnityEngine.UI;
 public class UIInGameManager : MonoBehaviour
 {
 
+    public Camera cam;
+
     //싱글톤 
     public static UIInGameManager instance;
+
+    public GameObject canvas;
 
     //Timer
     public Text timer;
@@ -30,13 +34,8 @@ public class UIInGameManager : MonoBehaviour
     public Text attackPointCurrentValue;
     public Text damageValue;
 
-    //Combo
-    public GameObject comboObject;
-    public Text comboText;
-
-    //Chain
-    public GameObject chainObject;
-    public Text chainText;
+    //popUp
+    public GameObject popUp;
 
     //Illust
     public Image illustImage;
@@ -77,7 +76,8 @@ public class UIInGameManager : MonoBehaviour
     }
 
 
-    public void UpdateRank(int rankNumber) {
+    public void UpdateRank(int rankNumber)
+    {
         if (oldRank != rankNumber)
         {
             oldRank = rankNumber;
@@ -87,7 +87,8 @@ public class UIInGameManager : MonoBehaviour
         }
     }
 
-    public void EndGame() {
+    public void EndGame()
+    {
         endPannel.SetActive(true);
         endText.text = "게임 결과!\n 순위 :" + oldRank;
     }
@@ -142,25 +143,27 @@ public class UIInGameManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Chain 수를 업데이트 하는 함수
+    /// Combo 와 Chain을 역동적으로 표현
     /// </summary>
-    /// <param name="chain">chain 수</param>
-    public void UpdateChain(int chain)
+    /// <param name="combo">Combo</param>
+    /// <param name="chain">Chain</param>
+    public void MakePopUp(int combo, int chain, Transform pos)
     {
-        chainText.text = "Chain x" + chain;
+        GameObject g = Instantiate(popUp);
+        RectTransform tr = g.GetComponent<RectTransform>();
+
+        Vector3 mainPos = Camera.main.WorldToScreenPoint(pos.position);
+        Vector3 uiPos = cam.ScreenToWorldPoint(mainPos);
+
+        tr.SetParent(canvas.transform, false);
+        tr.position = uiPos;
+        tr.GetChild(0).GetChild(0).GetComponent<Text>().text = "Combo x " + combo + "\nChain x " + chain;
+
+        Destroy(g,1F);
     }
 
-    /// <summary>
-    /// Combo 수를 업데이트 하는 함수
-    /// </summary>
-    /// <param name="combo">combo 수</param>
-    public void UpdateCombo(int combo)
+    public void UpdateWaitPannel()
     {
-        comboText.text = "Combo " + combo;
-        comboObject.GetComponent<Animator>().SetTrigger("Combo");
-    }
-
-    public void UpdateWaitPannel() {
         waitPannel.SetActive(false);
     }
 
@@ -198,31 +201,38 @@ public class UIInGameManager : MonoBehaviour
 
         for (int i = 0; i < room.userList.Count; i++)
         {
-            rankTexts[i].text = room.userList[i].name+ " : " + room.userList[i].score;
-            if (room.userList[i].name == PlayerDataManager.instance.my.name) {
-                UpdateRank((i+1));
+            rankTexts[i].text = room.userList[i].name + " : " + room.userList[i].score;
+            if (room.userList[i].name == PlayerDataManager.instance.my.name)
+            {
+                UpdateRank((i + 1));
             }
         }
 
     }
 
-    public void ChatSend() {
+    public void ChatSend()
+    {
         NetworkManager.instance.EmitChat(PlayerDataManager.instance.my.name, chatInput.text);
         chatInput.text = "";
     }
 
-    public void UpdateChatLog(string name, string message) {
+    public void UpdateChatLog(string name, string message)
+    {
         if (cnt >= 2)
         {
             cnt = 0;
             chatLog.text = "";
         }
-        chatLog.text += name +" : \n"+message+"\n";
+        chatLog.text += name + " : \n" + message + "\n";
         cnt++;
     }
 
-    public void ExitGame() {
+    public void ExitGame()
+    {
         NetworkManager.instance.EmitExitRoom();
     }
+
+
+
 
 }

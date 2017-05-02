@@ -18,7 +18,8 @@ public class NetworkManager : MonoBehaviour
 
     int index;
 
-    void Awake() {
+    void Awake()
+    {
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -40,17 +41,18 @@ public class NetworkManager : MonoBehaviour
         socket.On("roomList", OnRoomList);
         socket.On("roomFinish", OnUpdateLobby);
         socket.On("out", OnExitRoom);
-        
+
     }
 
 
-    public void EmitRoomList() {
+    public void EmitRoomList()
+    {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
-        json.AddField("a",2);
-        socket.Emit("roomList",json);
+        json.AddField("a", 2);
+        socket.Emit("roomList", json);
     }
 
-    
+
     public void EmitLogin(string name)
     {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
@@ -60,7 +62,8 @@ public class NetworkManager : MonoBehaviour
 
     }
 
-    public void OnLogin(SocketIOEvent e) {
+    public void OnLogin(SocketIOEvent e)
+    {
         JSONObject json = e.data;
 
         PlayerDataManager.instance.my.socketID = json.GetField("socketID").str;
@@ -71,9 +74,8 @@ public class NetworkManager : MonoBehaviour
         enterRoom.userList.Clear();
 
 
-        
+
         LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
-        
 
         for (int i = 0; i < json["userList"].Count; ++i)
         {
@@ -82,16 +84,19 @@ public class NetworkManager : MonoBehaviour
             user.socketID = json["userList"][i]["socketID"].ToString();
             user.name = json["userList"][i]["name"].ToString();
             user.characterID = int.Parse(json["userList"][i]["character"].ToString());
-            
+
 
             enterRoom.userList.Add(user);
         }
     }
 
-    public void OnEnterRoom(SocketIOEvent e) {
+
+    public void OnEnterRoom(SocketIOEvent e)
+    {
         JSONObject json = e.data;
         string roomName = json.GetField("roomName").str;
-        for (int i = 0; i < roomList.Count; i++) {
+        for (int i = 0; i < roomList.Count; i++)
+        {
             if (roomName == roomList[i].id + roomList[i].name)
             {
                 enterRoom = roomList[i];
@@ -105,13 +110,13 @@ public class NetworkManager : MonoBehaviour
     public void OnJoin(SocketIOEvent e)
     {
         JSONObject json = e.data;
-        
+
         string name = json.GetField("name").str;
         string socketID = json.GetField("socketID").str;
         int characterID = (int)(json.GetField("character").f);
 
         enterRoom.userList.Add(new User(name, socketID, characterID));
-        
+
     }
 
     public void EmitJoin(Room room)
@@ -126,7 +131,8 @@ public class NetworkManager : MonoBehaviour
     }
 
 
-    public void EmitReady() {
+    public void EmitReady()
+    {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
         json.AddField("socketID", PlayerDataManager.instance.my.socketID);
         json.AddField("name", PlayerDataManager.instance.my.name);
@@ -135,8 +141,10 @@ public class NetworkManager : MonoBehaviour
         socket.Emit("ready", json);
     }
 
-    public void OnStart(SocketIOEvent e) {
+    public void OnStart(SocketIOEvent e)
+    {
         GameManager.instance.isplayed = true;
+        BoardManager.instance.CreatHexTile();
         UIInGameManager.instance.UpdateWaitPannel();
     }
 
@@ -146,8 +154,8 @@ public class NetworkManager : MonoBehaviour
 
         string name = json.GetField("name").str;
         string message = json.GetField("message").str;
-        
-        UIInGameManager.instance.UpdateChatLog(name,message);
+
+        UIInGameManager.instance.UpdateChatLog(name, message);
     }
 
     public void EmitChat(string name, string message)
@@ -211,9 +219,10 @@ public class NetworkManager : MonoBehaviour
     public void OnRoomList(SocketIOEvent e)
     {
         roomList.Clear();
-        
+
         LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
-        for (int i = 0;  i < json["roomLists"].Count; ++i) {
+        for (int i = 0; i < json["roomLists"].Count; ++i)
+        {
             Room room = new Room();
 
             room.id = int.Parse(json["roomLists"][i]["id"].ToString());
@@ -226,22 +235,25 @@ public class NetworkManager : MonoBehaviour
         }
     }
 
-    public void OnUpdateLobby(SocketIOEvent e) {
+    public void OnUpdateLobby(SocketIOEvent e)
+    {
         UILobbyManager.instance.MakeSlots();
     }
 
-    public void EmitMakeRoom(string name, int max) {
+    public void EmitMakeRoom(string name, int max)
+    {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
 
         json.AddField("roomName", name);
-        json.AddField("fullPlayers",max);
-        
+        json.AddField("fullPlayers", max);
+
         socket.Emit("make", json);
 
 
     }
 
-    public void EmitExitRoom() {
+    public void EmitExitRoom()
+    {
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
 
         json.AddField("a", 1);
@@ -249,7 +261,8 @@ public class NetworkManager : MonoBehaviour
         socket.Emit("out", json);
     }
 
-    public void OnExitRoom(SocketIOEvent e) {
+    public void OnExitRoom(SocketIOEvent e)
+    {
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
     }
 

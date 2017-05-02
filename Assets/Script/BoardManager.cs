@@ -27,6 +27,7 @@ public class BoardManager : MonoBehaviour
     public float atkPoint = 0, atkMaxPoint = 10;
     public int chain;
 
+    public Transform rootTransform;
 
     void Awake()
     {
@@ -41,8 +42,6 @@ public class BoardManager : MonoBehaviour
         player = Player.instance;
         gameManager = GameManager.instance;
 
-        CreatHexTile();
-
         StartCoroutine("ReadyForSecondes");
     }
 
@@ -51,7 +50,7 @@ public class BoardManager : MonoBehaviour
         NetworkManager.instance.EmitReady();
     }
 
-    void CreatHexTile()
+    public void CreatHexTile()
     {
         //변수를 캐싱
         GameObject g;
@@ -191,11 +190,11 @@ public class BoardManager : MonoBehaviour
                 player.combo++;
                 chain = selectTileList.Count;
                 SoundManager.instance.PlayComboVoice(player.combo);
-                uiManager.UpdateCombo(player.combo);
-                uiManager.UpdateChain(chain);
+                uiManager.MakePopUp(player.combo,chain, rootTransform);
                 KindWork(tileList[selectTileList[0] - 1].kind, selectTileList.Count);
                 ResetKind();
                 selectTileList.Clear();
+                rootTransform = null;
             }
             else {
                 player.combo = 0;

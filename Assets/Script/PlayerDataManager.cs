@@ -8,6 +8,8 @@ public class PlayerDataManager : MonoBehaviour {
 
     public User my;
 
+    public int where;
+
     void Awake() {
         instance = this;
         DontDestroyOnLoad(this.gameObject);

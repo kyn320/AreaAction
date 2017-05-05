@@ -8,6 +8,7 @@ public class User {
     public string name;
     public string socketID;
     public int score;
+    public int rank;
     public int characterID;
 
     public User() {
@@ -20,7 +21,7 @@ public class User {
     {
         this.name = name;
         this.score = 0;
-        this.characterID = 0;
+        this.characterID = Random.Range(1,5);
     }
 
     public User(string name , string socketID)

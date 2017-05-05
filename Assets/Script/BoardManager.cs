@@ -57,8 +57,8 @@ public class BoardManager : MonoBehaviour
         Transform tr;
         Tile t;
         int cnt = 0;
-        //총 9 줄을 만듦.
-        for (int i = 0; i < 9; i++)
+        //총 7 줄을 만듦.
+        for (int i = 0; i < 7; i++)
         {
             //각 줄의 타일 갯수를 받습니다.
             int tilecount = SelectLineCnt(i + 1);
@@ -95,12 +95,12 @@ public class BoardManager : MonoBehaviour
     {
         int rand = Random.Range(0, 101);
 
-        if (0 <= rand && rand <= 100)
+        if (0 <= rand && rand < 80)
         {
             int scoreRand = Random.Range(1, 6);
             return scoreRand;
         }
-        else if (80 <= rand && rand < 90)
+        else if (80 <= rand && rand <= 100)
         {
             int actionRand = Random.Range(0,20);
             if (player.info.job == Job.Attack)
@@ -156,10 +156,6 @@ public class BoardManager : MonoBehaviour
             case 6:
                 return 6;
             case 7:
-                return 7;
-            case 8:
-                return 6;
-            case 9:
                 return 5;
             default:
                 Debug.LogError("지정되지 않은 Line을 Return 할 수 없습니다.");
@@ -232,12 +228,6 @@ public class BoardManager : MonoBehaviour
                 break;
             //==== 스킬 1 포인트 블럭
             case 8:
-                break;
-            //==== 스킬 2 포인트 블럭
-            case 9:
-                break;
-            //==== 스킬 3 포인트 블럭
-            case 10:
                 break;
             //==== 공격력 증가
             case 11:

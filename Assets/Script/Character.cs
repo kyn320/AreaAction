@@ -21,9 +21,9 @@ public class Character {
 
     public int requireAttackPoint;
 
-    public Skill[] skills = new Skill[3];
+    public Skill skills;
 
-    public CharacterOption options;
+    //public CharacterOption options;
 
     public Sprite illust;
 }

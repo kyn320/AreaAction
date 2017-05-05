@@ -38,6 +38,8 @@ public class NetworkManager : MonoBehaviour
         socket.On("chat", OnChat);
         socket.On("score", OnScore);
         socket.On("attack", OnAttack);
+        socket.On("hpchange", OnHpChange);
+        socket.On("death", OnDeath);
         socket.On("roomList", OnRoomList);
         socket.On("roomFinish", OnUpdateLobby);
         socket.On("out", OnExitRoom);
@@ -73,8 +75,6 @@ public class NetworkManager : MonoBehaviour
     {
         enterRoom.userList.Clear();
 
-
-
         LitJson.JsonData json = LitJson.JsonMapper.ToObject(e.data.ToString());
 
         for (int i = 0; i < json["userList"].Count; ++i)
@@ -87,6 +87,8 @@ public class NetworkManager : MonoBehaviour
 
 
             enterRoom.userList.Add(user);
+            UIInGameManager.instance.userSlots[enterRoom.userList.Count - 1].gameObject.SetActive(true);
+            UIInGameManager.instance.userSlots[enterRoom.userList.Count - 1].SetInfo(user);
         }
     }
 
@@ -103,6 +105,7 @@ public class NetworkManager : MonoBehaviour
                 break;
             }
         }
+        PlayerDataManager.instance.where = 2;
 
         UnityEngine.SceneManagement.SceneManager.LoadScene("InGameUI");
     }
@@ -114,9 +117,11 @@ public class NetworkManager : MonoBehaviour
         string name = json.GetField("name").str;
         string socketID = json.GetField("socketID").str;
         int characterID = (int)(json.GetField("character").f);
-
-        enterRoom.userList.Add(new User(name, socketID, characterID));
-
+        User user = new User(name, socketID, characterID);
+        enterRoom.userList.Add(user);
+        UIInGameManager.instance.userSlots[enterRoom.userList.Count - 1].gameObject.SetActive(true);
+        UIInGameManager.instance.userSlots[enterRoom.userList.Count - 1].SetInfo(user);
+        UIInGameManager.instance.UpdateNotice(user.name+"님께서 참여하셨습니다.");
     }
 
     public void EmitJoin(Room room)
@@ -125,7 +130,7 @@ public class NetworkManager : MonoBehaviour
         json.AddField("roomName", room.id + room.name);
         json.AddField("socketID", PlayerDataManager.instance.my.socketID);
         json.AddField("name", PlayerDataManager.instance.my.name);
-        json.AddField("character", 3);
+        json.AddField("character", PlayerDataManager.instance.my.characterID);
 
         socket.Emit("join", json);
     }
@@ -136,16 +141,18 @@ public class NetworkManager : MonoBehaviour
         JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
         json.AddField("socketID", PlayerDataManager.instance.my.socketID);
         json.AddField("name", PlayerDataManager.instance.my.name);
-        json.AddField("character", 3);
+        json.AddField("character", PlayerDataManager.instance.my.characterID);
 
         socket.Emit("ready", json);
     }
 
     public void OnStart(SocketIOEvent e)
     {
+        GameManager.instance.isAlive = enterRoom.userList.Count;
         GameManager.instance.isplayed = true;
         BoardManager.instance.CreatHexTile();
         UIInGameManager.instance.UpdateWaitPannel();
+        UIInGameManager.instance.UpdateNotice("게임 시작!");
     }
 
     public void OnChat(SocketIOEvent e)
@@ -155,7 +162,12 @@ public class NetworkManager : MonoBehaviour
         string name = json.GetField("name").str;
         string message = json.GetField("message").str;
 
-        UIInGameManager.instance.UpdateChatLog(name, message);
+        switch (PlayerDataManager.instance.where)
+        {
+            case 0: break;
+            case 1: UILobbyManager.instance.UpdateChat(name, message); break;
+            case 2: UIInGameManager.instance.UpdateChatLog(enterRoom.userList.Count, name, message); break;
+        }
     }
 
     public void EmitChat(string name, string message)
@@ -202,8 +214,14 @@ public class NetworkManager : MonoBehaviour
 
         string name = json.GetField("name").str;
         int damage = (int)(json.GetField("damage").f);
+        string other = json.GetField("other").str;
 
-        print(name + "님께서 공격 = " + damage);
+        print(name + "님께서 공격 = " + damage + " >> " + other);
+        UIInGameManager.instance.UpdateNotice(name+"님이 "+other+"님에게 "+damage+"의 데미지를 입혔습니다.");
+        if (other == PlayerDataManager.instance.my.name)
+        {
+            Player.instance.DamageHP(damage);
+        }
     }
 
     public void EmitAttack(string name, int damage, string other)
@@ -214,6 +232,49 @@ public class NetworkManager : MonoBehaviour
         json.AddField("other", other);
 
         socket.Emit("attack", json);
+    }
+
+    public void OnHpChange(SocketIOEvent e)
+    {
+        JSONObject json = e.data;
+
+        string name = json.GetField("name").str;
+        int hp = (int)(json.GetField("hp").f);
+        int maxhp = (int)(json.GetField("maxhp").f);
+
+        print(name + "님의 HP : " + hp + " / " + maxhp);
+
+        UIInGameManager.instance.UpdateUserSlotHpChange(enterRoom.userList.Count, name, hp, maxhp);
+    }
+
+    public void EmitHpChange(string name, int hp, int maxHp)
+    {
+        JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
+        json.AddField("name", name);
+        json.AddField("hp", hp);
+        json.AddField("maxhp", maxHp);
+
+        socket.Emit("hpchange", json);
+    }
+
+
+    public void OnDeath(SocketIOEvent e)
+    {
+        JSONObject json = e.data;
+
+        string name = json.GetField("name").str;
+
+        print(name + " is dead");
+        UIInGameManager.instance.UpdateNotice(name+"님이 사망하였습니다.");
+        GameManager.instance.DownIsAlive();
+    }
+
+    public void EmitDeath(string name)
+    {
+        JSONObject json = new JSONObject(JSONObject.Type.OBJECT);
+        json.AddField("name", name);
+
+        socket.Emit("death", json);
     }
 
     public void OnRoomList(SocketIOEvent e)
@@ -264,6 +325,19 @@ public class NetworkManager : MonoBehaviour
     public void OnExitRoom(SocketIOEvent e)
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
+    }
+
+
+
+    public string EnterRoomGetRandomUser()
+    {
+        string user = "";
+        do
+        {
+            user = enterRoom.userList[Random.Range(0, enterRoom.userList.Count)].name;
+        } while (user == PlayerDataManager.instance.my.name);
+        return user;
+
     }
 
 }

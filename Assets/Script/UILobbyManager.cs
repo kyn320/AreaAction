@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UILobbyManager : MonoBehaviour {
+public class UILobbyManager : MonoBehaviour
+{
 
     public static UILobbyManager instance;
 
@@ -21,24 +22,35 @@ public class UILobbyManager : MonoBehaviour {
 
     //MakeRoom
     public InputField roomTitleInput;
-    public Dropdown roomMaxNumber;
+    public Text maxNumberSetButtonText;
+    public int maxNumberSet = 2;
+
+    //chatLog
+    public InputField chatInput;
+    public Text chatOneLine;
+    public Text chatLog;
+    int chatCount;
 
     [SerializeField]
     int count;
 
-    void Awake() {
+    void Awake()
+    {
         instance = this;
     }
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         NetworkManager.instance.EmitRoomList();
 
         SetPlayerName();
+        PlayerDataManager.instance.where = 1;
     }
-    
 
-    public void MakeSlots() {
+
+    public void MakeSlots()
+    {
         DelRoomList();
 
         count = NetworkManager.instance.roomList.Count;
@@ -47,8 +59,9 @@ public class UILobbyManager : MonoBehaviour {
 
         contentView.sizeDelta = new Vector2(0, height);
 
-        for (int i = 0; i < count; i++) {
-            GameObject g =  Instantiate(slot);
+        for (int i = 0; i < count; i++)
+        {
+            GameObject g = Instantiate(slot);
             RectTransform gTr = g.GetComponent<RectTransform>();
             UIRoomSlot data = g.GetComponent<UIRoomSlot>();
             slotList.Add(data);
@@ -60,21 +73,53 @@ public class UILobbyManager : MonoBehaviour {
         }
     }
 
-    public void SetPlayerName() {
+    public void SetPlayerName()
+    {
         playerNameText.text = PlayerDataManager.instance.my.name + "님 환영합니다!";
     }
 
-    public void DelRoomList() {
-        for (int i = 0; i < slotList.Count; i++) {
+
+
+    public void UpdateChat(string name, string message)
+    {
+        if (chatCount > 33)
+        {
+            chatLog.text = "";
+            chatCount = 0;
+        }
+
+        chatOneLine.text = name + " : " + message;
+        chatLog.text += name + " : " + message + "\n";
+        chatCount++;
+    }
+
+    public void DelRoomList()
+    {
+        for (int i = 0; i < slotList.Count; i++)
+        {
             slotList[i].Del();
         }
 
         slotList.Clear();
     }
 
-    public void MakeRoom() {
-        NetworkManager.instance.EmitMakeRoom(roomTitleInput.text, int.Parse(roomMaxNumber.options[roomMaxNumber.value].text));
+    public void MakeRoom()
+    {
+        NetworkManager.instance.EmitMakeRoom(roomTitleInput.text, maxNumberSet);
     }
 
+    public void SendChat()
+    {
+        if (chatInput.text != "")
+        {
+            NetworkManager.instance.EmitChat(PlayerDataManager.instance.my.name, chatInput.text);
+            chatInput.text = "";
+        }
+    }
+
+    public void SetMaxNumber(int num) {
+        maxNumberSet = num;
+        maxNumberSetButtonText.text = num + "명";
+    }
 
 }

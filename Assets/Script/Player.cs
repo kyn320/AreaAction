@@ -5,31 +5,38 @@ using UnityEngine;
 /// <summary>
 /// 플레이어 정보가 저장됨.
 /// </summary>
-public class Player : MonoBehaviour {
+public class Player : MonoBehaviour
+{
 
     public static Player instance;
     public Character info;
-    public float damage;
-    public float addDamage;
+    public float totalDamage;
     public float hp;
     public int attackPoint;
     public int combo;
-    public int[] skillPoints = new int[3] {0,0,0};
+    public int[] skillPoints = new int[3] { 0, 0, 0 };
     UIInGameManager ui;
 
-    void Awake() {
+    void Awake()
+    {
         instance = this;
     }
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start()
+    {
         ui = UIInGameManager.instance;
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+
+        RecoverHP(0);
+        AttackManager(0);
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
 
     /// <summary>
     /// 플레이어의 체력을 감소합니다.
@@ -37,11 +44,18 @@ public class Player : MonoBehaviour {
     /// <param name="damage">데미지</param>
     public void DamageHP(int damage)
     {
-        hp -= damage * info.options.SaveDamagePercent;
+        hp -= damage;
+        SoundManager.instance.PlayAttackSE();
 
-        hp = Mathf.Clamp(hp,-info.hp, info.hp);
+        hp = Mathf.Clamp(hp, 0, info.hp);
 
-        ui.UpdateHp(hp,info.hp);
+        if (hp <= 0) {
+            print("Death");
+            GameManager.instance.GameOver();
+            NetworkManager.instance.EmitDeath(PlayerDataManager.instance.my.name);
+        }
+
+        ui.UpdateHp(hp, info.hp);
     }
 
     /// <summary>
@@ -50,9 +64,10 @@ public class Player : MonoBehaviour {
     /// <param name="chain">체인 수</param>
     public void RecoverHP(int chain)
     {
-        hp += info.recover * chain * info.options.AddRecover;
+        hp += info.recover * chain;
+        SoundManager.instance.PlayHealSE();
 
-        hp = Mathf.Clamp(hp, -info.hp, info.hp);
+        hp = Mathf.Clamp(hp, 0, info.hp);
 
         ui.UpdateHp(hp, info.hp);
     }
@@ -65,25 +80,30 @@ public class Player : MonoBehaviour {
     {
         attackPoint += chain;
 
-        if (attackPoint - info.requireAttackPoint > 0) {
-            damage += (int)(chain * info.damage * 0.25f);
+        if (attackPoint - info.requireAttackPoint > 0)
+        {
+            totalDamage += (int)(chain * info.damage * 0.25f);
         }
 
-        ui.UpdateAttackPoint(attackPoint,info.requireAttackPoint);
-        ui.UpdateDamage(DamageWork());
+        ui.UpdateAttackPoint(attackPoint, info.requireAttackPoint);
+        ui.UpdateDamage((int)totalDamage);
     }
 
-    public void SetAddDamage(int v) {
-        addDamage += (int)(DamageWork() * v * 0.2f);
+    public void SetAddDamage(int v)
+    {
+        totalDamage += (int)(totalDamage * v * 0.2f);
     }
 
-    public void Attack() {
-        int totalDamage = DamageWork();
-        print("공격 = "+damage);
+    public void Attack()
+    {
+        print("공격 = " + (int)totalDamage);
+        SoundManager.instance.PlayAttackSE();
+        NetworkManager.instance.EmitAttack(PlayerDataManager.instance.my.name, (int)totalDamage, NetworkManager.instance.EnterRoomGetRandomUser());
+        attackPoint -= info.requireAttackPoint;
+
+        ui.UpdateAttackPoint(attackPoint, info.requireAttackPoint);
+        ui.UpdateDamage((int)totalDamage);
     }
 
-    public int DamageWork() {
-        return (int)((info.damage + damage) + ((info.damage + damage) * (addDamage + info.options.AddDamage)));
-    }
 
 }

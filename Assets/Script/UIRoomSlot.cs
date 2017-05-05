@@ -36,10 +36,12 @@ public class UIRoomSlot : MonoBehaviour
 
     public void JoinRoom()
     {
-        NetworkManager.instance.EmitJoin(info);
+        if (!info.isPlayed)
+            NetworkManager.instance.EmitJoin(info);
     }
 
-    public void Del() {
+    public void Del()
+    {
         Destroy(this.gameObject);
     }
 

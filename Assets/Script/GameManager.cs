@@ -20,6 +20,7 @@ public class GameManager : MonoBehaviour
     public int baseScore = 100;
 
     public int score = 0;
+    public int isAlive = 10;
 
     void Awake()
     {
@@ -49,10 +50,20 @@ public class GameManager : MonoBehaviour
         if (time < 0)
         {
             time = 10;
-            uiManager.EndGame();
-            BoardManager.instance.EndGame();
-            isplayed = false;
+            GameOver();
+            GameEnd();
         }
+    }
+
+    public void GameOver()
+    {
+        BoardManager.instance.EndGame();
+        isplayed = false;
+    }
+
+    public void GameEnd()
+    {
+        uiManager.EndGame();
     }
 
     /// <summary>
@@ -64,9 +75,18 @@ public class GameManager : MonoBehaviour
     public void AddScore(int chain, int combo, int multiple)
     {
         score += chain * baseScore * combo * multiple;
-        uiManager.UpdateScore(score);
         NetworkManager.instance.EmitScore(PlayerDataManager.instance.my.name, score);
     }
 
+    public void DownIsAlive()
+    {
+        --isAlive;
 
+        if (isAlive < 2)
+        {
+            if (isplayed)
+                GameOver();
+            GameEnd();
+        }
+    }
 }

@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     Player player;
 
     public bool isplayed = false;
+    public bool isDeath = false;
 
     public float time = 90;
     public int baseScore = 100;
@@ -57,12 +58,16 @@ public class GameManager : MonoBehaviour
 
     public void GameOver()
     {
-        BoardManager.instance.EndGame();
-        isplayed = false;
+        if (!isDeath)
+        {
+            BoardManager.instance.EndGame();
+            isDeath = true;
+        }
     }
 
     public void GameEnd()
     {
+        isplayed = false;
         uiManager.EndGame();
     }
 
@@ -86,6 +91,7 @@ public class GameManager : MonoBehaviour
         {
             if (isplayed)
                 GameOver();
+            
             GameEnd();
         }
     }

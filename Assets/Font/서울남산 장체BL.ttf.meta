@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 1db2121b06be6b741bef5b3bb87f8c00
+timeCreated: 1494048310
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: SeoulNamsan CBL
+  fontNames:
+  - SeoulNamsan CBL
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

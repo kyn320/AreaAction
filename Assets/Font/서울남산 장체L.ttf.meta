@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: dee1f45718d2ef646b2a52ec1e4a289d
+timeCreated: 1494048774
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: SeoulNamsan CL
+  fontNames:
+  - SeoulNamsan CL
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

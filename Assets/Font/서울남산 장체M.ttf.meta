@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 82005be868498924fa23a99fffa0b846
+timeCreated: 1494048542
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: SeoulNamsan CM
+  fontNames:
+  - SeoulNamsan CM
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

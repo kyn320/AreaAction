@@ -17,6 +17,8 @@ public class Player : MonoBehaviour
     public int[] skillPoints = new int[3] { 0, 0, 0 };
     UIInGameManager ui;
 
+    public GameObject particle;
+
     void Awake()
     {
         instance = this;
@@ -49,7 +51,7 @@ public class Player : MonoBehaviour
 
         hp = Mathf.Clamp(hp, 0, info.hp);
 
-        if (hp <= 0) {
+        if (!GameManager.instance.isDeath && hp <= 0) {
             print("Death");
             GameManager.instance.GameOver();
             NetworkManager.instance.EmitDeath(PlayerDataManager.instance.my.name);
@@ -98,11 +100,27 @@ public class Player : MonoBehaviour
     {
         print("공격 = " + (int)totalDamage);
         SoundManager.instance.PlayAttackSE();
-        NetworkManager.instance.EmitAttack(PlayerDataManager.instance.my.name, (int)totalDamage, NetworkManager.instance.EnterRoomGetRandomUser());
+        string name = NetworkManager.instance.EnterRoomGetRandomUser();
+        NetworkManager.instance.EmitAttack(PlayerDataManager.instance.my.name, (int)totalDamage, name);
         attackPoint -= info.requireAttackPoint;
-
+        AttackParticle(name);
         ui.UpdateAttackPoint(attackPoint, info.requireAttackPoint);
         ui.UpdateDamage((int)totalDamage);
+
+
+    }
+
+    void AttackParticle(string other) {
+        for (int i = 0; i < NetworkManager.instance.enterRoom.userList.Count; i++)
+        {
+            if (other == ui.userSlots[i].user.name)
+            {
+                Transform tr = ui.userSlots[i].transform;
+                GameObject g = Instantiate(particle,UIInGameManager.instance.attackPointGage.transform.position,Quaternion.identity);
+                g.GetComponent<TargetMove>().SetTarget(tr);
+                break;
+            }
+        }
     }
 
 

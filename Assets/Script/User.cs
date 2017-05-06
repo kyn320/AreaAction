@@ -11,6 +11,8 @@ public class User {
     public int rank;
     public int characterID;
 
+    public bool isDeath = false;
+
     public User() {
         this.name = "";
         this.score = 0;

@@ -121,7 +121,7 @@ public class NetworkManager : MonoBehaviour
         enterRoom.userList.Add(user);
         UIInGameManager.instance.userSlots[enterRoom.userList.Count - 1].gameObject.SetActive(true);
         UIInGameManager.instance.userSlots[enterRoom.userList.Count - 1].SetInfo(user);
-        UIInGameManager.instance.UpdateNotice(user.name+"님께서 참여하셨습니다.");
+        UIInGameManager.instance.UpdateNotice(user.name + "님께서 참여하셨습니다.");
     }
 
     public void EmitJoin(Room room)
@@ -217,7 +217,7 @@ public class NetworkManager : MonoBehaviour
         string other = json.GetField("other").str;
 
         print(name + "님께서 공격 = " + damage + " >> " + other);
-        UIInGameManager.instance.UpdateNotice(name+"님이 "+other+"님에게 "+damage+"의 데미지를 입혔습니다.");
+        UIInGameManager.instance.UpdateNotice(name + "님이 " + other + "님에게 " + damage + "의 데미지를 입혔습니다.");
         if (other == PlayerDataManager.instance.my.name)
         {
             Player.instance.DamageHP(damage);
@@ -265,7 +265,14 @@ public class NetworkManager : MonoBehaviour
         string name = json.GetField("name").str;
 
         print(name + " is dead");
-        UIInGameManager.instance.UpdateNotice(name+"님이 사망하였습니다.");
+        UIInGameManager.instance.UpdateNotice(name + "님이 사망하였습니다.");
+        for (int i = 0; i < enterRoom.userList.Count; i++)
+        {
+            if (name == enterRoom.userList[i].name)
+            {
+                enterRoom.userList[i].isDeath = true;
+            }
+        }
         GameManager.instance.DownIsAlive();
     }
 
@@ -331,12 +338,18 @@ public class NetworkManager : MonoBehaviour
 
     public string EnterRoomGetRandomUser()
     {
-        string user = "";
+        string name = "";
+        bool death = false;
+
         do
         {
-            user = enterRoom.userList[Random.Range(0, enterRoom.userList.Count)].name;
-        } while (user == PlayerDataManager.instance.my.name);
-        return user;
+            User user = enterRoom.userList[Random.Range(0, enterRoom.userList.Count)];
+            name = user.name;
+            death = user.isDeath;
+
+        } while (death || name == PlayerDataManager.instance.my.name);
+
+        return name;
 
     }
 

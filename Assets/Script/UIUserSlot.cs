@@ -76,9 +76,15 @@ public class UIUserSlot : MonoBehaviour
     {
         isChatView = true;
         chatBox.SetActive(true);
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(4f);
         isChatView = false;
         chatBox.SetActive(false);
     }
+
+    public void AttackParticlePlayer() {
+        GameObject g = Instantiate(Player.instance.particle, transform.position + (Vector3.up * 5f), Quaternion.identity);
+        g.GetComponent<TargetMove>().SetTarget(UIInGameManager.instance.hpGage.transform.position);
+    }
+
 
 }

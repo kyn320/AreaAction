@@ -69,7 +69,7 @@ public class UILobbyManager : MonoBehaviour
             gTr.localPosition = new Vector2(0, slotStartPos.y + -i * (slotSize.y) - slotMarign.y);
             gTr.localScale = new Vector3(1, 1, 1);
             gTr.sizeDelta = new Vector2(-10, 60);
-            data.SetSlot(NetworkManager.instance.roomList[i]);
+            data.SetSlot(i + 1, NetworkManager.instance.roomList[i]);
         }
     }
 

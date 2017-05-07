@@ -43,6 +43,7 @@ public class NetworkManager : MonoBehaviour
         socket.On("roomList", OnRoomList);
         socket.On("roomFinish", OnUpdateLobby);
         socket.On("out", OnExitRoom);
+        socket.On("userOut", OnExitUser);
 
     }
 
@@ -221,6 +222,12 @@ public class NetworkManager : MonoBehaviour
         if (other == PlayerDataManager.instance.my.name)
         {
             Player.instance.DamageHP(damage);
+            for (int i = 0; i < enterRoom.userList.Count; i++) {
+                if (name == UIInGameManager.instance.userSlots[i].user.name) {
+                    UIInGameManager.instance.userSlots[i].AttackParticlePlayer();
+                    break;
+                }
+            }
         }
     }
 
@@ -334,6 +341,12 @@ public class NetworkManager : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene("Lobby");
     }
 
+    public void OnExitUser(SocketIOEvent e) {
+        
+        if (enterRoom.userList.Count <= 1)
+            EmitExitRoom();
+
+    }
 
 
     public string EnterRoomGetRandomUser()

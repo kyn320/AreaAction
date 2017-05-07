@@ -15,11 +15,11 @@ public class UIRoomSlot : MonoBehaviour
 
     public Color waitColor, PlayingColor;
 
-    public void SetSlot(Room room)
+    public void SetSlot(int id,Room room)
     {
         info = room;
 
-        idText.text = "No. " + info.id.ToString();
+        idText.text = "No. " + id.ToString();
         if (info.isPlayed)
         {
             roomImage.color = PlayingColor;

@@ -30,6 +30,7 @@ public class Player : MonoBehaviour
         ui = UIInGameManager.instance;
 
         RecoverHP(0);
+        totalDamage = info.damage;
         AttackManager(0);
 
     }
@@ -117,7 +118,7 @@ public class Player : MonoBehaviour
             {
                 Transform tr = ui.userSlots[i].transform;
                 GameObject g = Instantiate(particle,UIInGameManager.instance.attackPointGage.transform.position,Quaternion.identity);
-                g.GetComponent<TargetMove>().SetTarget(tr);
+                g.GetComponent<TargetMove>().SetTarget(tr.position + (Vector3.up * 5f));
                 break;
             }
         }

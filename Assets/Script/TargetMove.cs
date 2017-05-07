@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TargetMove : MonoBehaviour {
 
-    public Transform target;
+    public Vector3 target;
     Transform tr;
     public bool isMove = false, isFinish = false;
 
@@ -12,18 +12,17 @@ public class TargetMove : MonoBehaviour {
         tr = GetComponent<Transform>();
     }
 
-    public void SetTarget(Transform tr) {
+    public void SetTarget(Vector3 tr) {
         target = tr;
         isMove = true;
-        print(target.position);
     }
 
 	// Update is called once per frame
 	void Update () {
         if (isMove)
-            tr.position = Vector3.MoveTowards(transform.position, target.position + (Vector3.up * 5f), Time.deltaTime * 100f);
+            tr.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * 100f);
 
-        if (!isFinish && tr.position == target.position) {
+        if (!isFinish && tr.position == target) {
             isFinish = true;
             StartCoroutine("Remove");
         }
